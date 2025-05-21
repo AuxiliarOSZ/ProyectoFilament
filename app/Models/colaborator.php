@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class colaborator extends Model
+class Colaborator extends Model
 {
     protected $fillable = [
         'document_type',
