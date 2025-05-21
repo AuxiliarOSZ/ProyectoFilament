@@ -25,7 +25,7 @@ class Colaborator extends Model
         'status',
         'eps',
         'arl',
-        'notes',
+        'notes',            
     ];
 
 }
