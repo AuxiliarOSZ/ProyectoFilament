@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ColaboratorResource\Pages;
 use App\Filament\Resources\ColaboratorResource\RelationManagers;
 use App\Models\Colaborator;
+use DeepCopy\Filter\Filter;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -17,9 +18,14 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
+use Filament\Tables\Actions\Action;
 
 class ColaboratorResource extends Resource
 {
@@ -45,8 +51,8 @@ class ColaboratorResource extends Resource
                                         Grid::make(1)
                                             ->columns([
                                                 'default' => 1,
-                                                'sm' => 2,
-                                                'md' => 4,
+                                                'sm' => 1,
+                                                'md' => 3,
                                                 'lg' => 4,
                                             ])
                                             ->schema([
@@ -107,13 +113,13 @@ class ColaboratorResource extends Resource
 
 
                                                 TextInput::make('mobile')
-                                                    ->label('Número de teléfono móvil')
+                                                    ->label('Número teléfono móvil')
                                                     ->numeric()
                                                     ->maxLength(20)
                                                     ->required(),
 
                                                 TextInput::make('phone')
-                                                    ->label('Número de teléfono fijo')
+                                                    ->label('Número teléfono fijo')
                                                     ->numeric()
                                                     ->maxLength(20),
                                                 
@@ -153,12 +159,14 @@ class ColaboratorResource extends Resource
                                         FileUpload::make('eps')
                                             ->label('EPS')
                                             ->required()
-                                            ->extraAttributes(['class' => 'min-h-[42px] py-8 w-[250px]']),
+                                            ->panelAspectRatio('2:1')
+                                            ->extraAttributes(['class' => ' py-2']),
 
                                         FileUpload::make('arl')
                                             ->label('ARL')
                                             ->required()
-                                            ->extraAttributes(['class' => 'min-h-[42px] py-8 w-[250px]']),
+                                            ->panelAspectRatio('2:1')
+                                            ->extraAttributes(['class' => ' py-2']),
                                     ])
                                     ->columnSpan(['lg' => 1]),
                             ])
@@ -170,7 +178,7 @@ class ColaboratorResource extends Resource
                                     Grid::make(1)
                                             ->columns([
                                                 'default' => 1,
-                                                'sm' => 2,
+                                                'sm' => 1,
                                                 'md' => 2,
                                                 'lg' => 2,
                                             ])
@@ -204,7 +212,6 @@ class ColaboratorResource extends Resource
 
                                                 Toggle::make('status')
                                                     ->label('Activo')
-                                                    ->required()
                                             ])
                     
             
@@ -219,80 +226,68 @@ class ColaboratorResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('first_name')
                 ->label('Nombres')
+                ->sortable()
                 ->searchable(),
 
                 Tables\Columns\TextColumn::make('last_name')
                 ->label('Apellidos')
+                ->sortable()
                 ->searchable(),
 
                 Tables\Columns\TextColumn::make('document_number')
-                ->label('Número de documento')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('gender')
-                ->label('Género')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('birth_date')
-                ->label('Fecha de nacimiento')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('personal_email')
-                ->label('Correo electrónico personal')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('corporate_email')
-                ->label('Correo electrónico corporativo')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('mobile')
-                ->label('Número de teléfono móvil')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('phone')
-                ->label('Número de teléfono fijo')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('address')
-                ->label('Dirección')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('residential_city')
-                ->label('Ciudad de residencia')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('education_level')
-                ->label('Nivel educativo')
+                ->label('Número documento')
                 ->searchable(),
 
                 Tables\Columns\TextColumn::make('job_position')
                 ->label('Cargo')
                 ->searchable(),
-
-                Tables\Columns\TextColumn::make('hire_date')
-                ->label('Fecha de contratación')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('eps')
-                ->label('EPS')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('arl')
-                ->label('ARL')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('notes')
-                ->label('Observaciones')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('status')
+                
+                Tables\Columns\IconColumn::make('status')
                 ->label('Activo')
-                ->searchable(),
+                ->trueIcon('heroicon-o-check-circle')
+                ->trueColor('success')
+                ->falseIcon('heroicon-o-x-circle')
+                ->falseColor('danger')
+                ->boolean(),
+               
             ])
             ->filters([
-                //
+
+                SelectFilter::make('job_position')
+                ->label('Cargo')
+                ->options([
+                    'Jefe de proyecto' => 'Jefe de proyecto',
+                    'Desarrollador' => 'Desarrollador',
+                    'Analista' => 'Analista',
+                    'Tester' => 'Tester',
+                ]),
+
+                SelectFilter::make('status')
+                    ->label('Activo')
+                    ->options([
+                        '1' => 'Activo',
+                        '0' => 'Inactivo',
+                    ]),
             ])
             ->actions([
+                    
+                    ViewAction::make()
+                    ->modalHeading('Detalles del colaborador')
+                    ->modalWidth('6xl'),
+
+
+
+                    Action::make('Documentos')
+                        ->modalWidth('6xl')
+                        ->icon('heroicon-o-document')
+                        ->modalIcon('heroicon-o-document')
+                        ->modalContent(function ($record){
+                            return view('components.file-modal', [
+                                'epsUrl' => Storage::url($record->eps),
+                                'arlUrl' => Storage::url($record->arl)
+                            ]);
+                        }),
+                
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
