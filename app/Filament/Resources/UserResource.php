@@ -53,7 +53,10 @@ class UserResource extends Resource
                         TextInput::make('email')
                             ->email()
                             ->required()
-                            ->unique()
+                            ->unique(
+                                table: 'users', 
+                                column: 'email', 
+                                ignorable: fn ($record) => $record)
                             ->validationMessages([
                                 'unique' => "Este correo ya ha sido utilizado."
                             ]
