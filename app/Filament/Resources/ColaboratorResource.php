@@ -24,6 +24,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
+use Filament\Tables\Actions\Action;
 
 class ColaboratorResource extends Resource
 {
@@ -155,12 +157,14 @@ class ColaboratorResource extends Resource
                                         FileUpload::make('eps')
                                             ->label('EPS')
                                             ->required()
-                                            ->extraAttributes(['class' => 'min-h-[42px] py-8 w-[250px]']),
+                                            ->panelAspectRatio('2:1')
+                                            ->extraAttributes(['class' => ' py-2']),
 
                                         FileUpload::make('arl')
                                             ->label('ARL')
                                             ->required()
-                                            ->extraAttributes(['class' => 'min-h-[42px] py-8 w-[250px]']),
+                                            ->panelAspectRatio('2:1')
+                                            ->extraAttributes(['class' => ' py-2']),
                                     ])
                                     ->columnSpan(['lg' => 1]),
                             ])
@@ -258,6 +262,17 @@ class ColaboratorResource extends Resource
                     
                     ViewAction::make()
                         ->modalWidth('6xl'),
+
+                    Action::make('Documentos')
+                        ->modalWidth('6xl')
+                        ->icon('heroicon-o-document')
+                        ->modalIcon('heroicon-o-document')
+                        ->modalContent(function ($record){
+                            return view('components.file-modal', [
+                                'epsUrl' => Storage::url($record->eps),
+                                'arlUrl' => Storage::url($record->arl)
+                            ]);
+                        }),
                 
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
