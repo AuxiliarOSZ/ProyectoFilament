@@ -176,7 +176,7 @@ class ColaboratorResource extends Resource
                                     Grid::make(1)
                                             ->columns([
                                                 'default' => 1,
-                                                'sm' => 2,
+                                                'sm' => 1,
                                                 'md' => 2,
                                                 'lg' => 2,
                                             ])
@@ -224,14 +224,12 @@ class ColaboratorResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('first_name')
                 ->label('Nombres')
+                ->sortable()
                 ->searchable(),
 
                 Tables\Columns\TextColumn::make('last_name')
                 ->label('Apellidos')
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('gender')
-                ->label('Género')
+                ->sortable()
                 ->searchable(),
 
                 Tables\Columns\TextColumn::make('document_number')
@@ -241,15 +239,26 @@ class ColaboratorResource extends Resource
                 Tables\Columns\TextColumn::make('job_position')
                 ->label('Cargo')
                 ->searchable(),
+                
+                Tables\Columns\IconColumn::make('status')
+                ->label('Activo')
+                ->trueIcon('heroicon-o-check-circle')
+                ->trueColor('success')
+                ->falseIcon('heroicon-o-x-circle')
+                ->falseColor('danger')
+                ->boolean(),
                
             ])
             ->filters([
 
-                TernaryFilter::make('phone')
-                ->nullable()
-                ->trueLabel('Si')
-                ->falseLabel('No')
-                    ->label('Tiene teléfono'),
+                SelectFilter::make('job_position')
+                ->label('Cargo')
+                ->options([
+                    'Jefe de proyecto' => 'Jefe de proyecto',
+                    'Desarrollador' => 'Desarrollador',
+                    'Analista' => 'Analista',
+                    'Tester' => 'Tester',
+                ]),
 
                 SelectFilter::make('status')
                     ->label('Activo')
@@ -261,7 +270,10 @@ class ColaboratorResource extends Resource
             ->actions([
                     
                     ViewAction::make()
-                        ->modalWidth('6xl'),
+                    ->modalHeading('Detalles del colaborador')
+                    ->modalWidth('6xl'),
+
+
 
                     Action::make('Documentos')
                         ->modalWidth('6xl')
