@@ -27,19 +27,40 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Filament\Tables\Actions\Action;
 
+/**
+ * Clase que gestiona el recurso de Colaboradores en el panel administrativo de Filament.
+ * Proporciona funcionalidades CRUD para la gestión de colaboradores, incluyendo sus datos personales y laborales,
+ * así como la gestión de documentos (EPS y ARL).
+ */
 class ColaboratorResource extends Resource
 {
+    /**
+     * Define el modelo asociado al recurso
+     */
     protected static ?string $model = Colaborator::class;
 
+    /**
+     * Define el ícono de navegación para el recurso en el panel lateral
+     */
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    /**
+     * Define el orden de aparición en el menú de navegación
+     */
     protected static ?int $navigationSort = 2;
 
+    /**
+     * Define el formulario para crear y editar colaboradores
+     * Incluye secciones para datos personales y laborales
+     * @param Form $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form  
         
             ->schema([
+                // Sección principal para datos personales del colaborador
                 Section::make('Datos personales')
                 
                     ->schema([
@@ -220,28 +241,39 @@ class ColaboratorResource extends Resource
                         ]);
     }
 
+    /**
+     * Define la estructura y comportamiento de la tabla de colaboradores
+     * Incluye columnas, filtros y acciones disponibles
+     * @param Table $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // Columna para mostrar los nombres del colaborador
                 Tables\Columns\TextColumn::make('first_name')
                 ->label('Nombres')
                 ->sortable()
                 ->searchable(),
 
+                // Columna para mostrar los apellidos del colaborador
                 Tables\Columns\TextColumn::make('last_name')
                 ->label('Apellidos')
                 ->sortable()
                 ->searchable(),
 
+                // Columna para mostrar el número de documento
                 Tables\Columns\TextColumn::make('document_number')
                 ->label('Número documento')
                 ->searchable(),
 
+                // Columna para mostrar el cargo del colaborador
                 Tables\Columns\TextColumn::make('job_position')
                 ->label('Cargo')
                 ->searchable(),
                 
+                // Columna que muestra el estado del colaborador con un ícono
                 Tables\Columns\IconColumn::make('status')
                 ->label('Activo')
                 ->trueIcon('heroicon-o-check-circle')
@@ -252,7 +284,7 @@ class ColaboratorResource extends Resource
                
             ])
             ->filters([
-
+                // Filtro para filtrar colaboradores por cargo
                 SelectFilter::make('job_position')
                 ->label('Cargo')
                 ->options([
@@ -262,6 +294,7 @@ class ColaboratorResource extends Resource
                     'Tester' => 'Tester',
                 ]),
 
+                // Filtro para filtrar colaboradores por estado
                 SelectFilter::make('status')
                     ->label('Activo')
                     ->options([
@@ -270,34 +303,39 @@ class ColaboratorResource extends Resource
                     ]),
             ])
             ->actions([
-                    
-                    ViewAction::make()
+                // Acción para ver detalles del colaborador
+                ViewAction::make()
                     ->modalHeading('Detalles del colaborador')
                     ->modalWidth('6xl'),
 
-
-
-                    Action::make('Documentos')
-                        ->modalWidth('6xl')
-                        ->icon('heroicon-o-document')
-                        ->modalIcon('heroicon-o-document')
-                        ->modalContent(function ($record){
-                            return view('components.file-modal', [
-                                'epsUrl' => Storage::url($record->eps),
-                                'arlUrl' => Storage::url($record->arl)
-                            ]);
-                        }),
+                // Acción para ver documentos del colaborador
+                Action::make('Documentos')
+                    ->modalWidth('6xl')
+                    ->icon('heroicon-o-document')
+                    ->modalIcon('heroicon-o-document')
+                    ->modalContent(function ($record){
+                        return view('components.file-modal', [
+                            'epsUrl' => Storage::url($record->eps),
+                            'arlUrl' => Storage::url($record->arl)
+                        ]);
+                    }),
                 
+                // Acciones estándar de edición y eliminación
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
+                // Grupo de acciones masivas
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ])
             ]);
     }
 
+    /**
+     * Define las relaciones disponibles para el recurso de colaboradores
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -305,6 +343,11 @@ class ColaboratorResource extends Resource
         ];
     }
 
+    /**
+     * Define las páginas disponibles para el recurso de colaboradores
+     * Incluye listado, creación y edición
+     * @return array
+     */
     public static function getPages(): array
     {
         return [
