@@ -10,10 +10,21 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 
+/**
+ * Importador de Colaboradores para Filament
+ * 
+ * Esta clase maneja la importación de datos de colaboradores desde archivos externos
+ * hacia el modelo Colaborator en la base de datos.
+ */
 class ColaboratorImporter extends Importer
 {
     protected static ?string $model = Colaborator::class;
 
+    /**
+     * Define las columnas y reglas de validación para la importación
+     * 
+     * @return array Array de columnas configuradas con sus respectivas reglas de validación
+     */
     public static function getColumns(): array
     {
         return [
@@ -91,6 +102,14 @@ class ColaboratorImporter extends Importer
         ];
     }
 
+    /**
+     * Resuelve o crea un registro de Colaborador basado en el número de documento
+     * 
+     * Este método busca un colaborador existente por número de documento o crea uno nuevo
+     * si no existe.
+     * 
+     * @return Colaborator|null Retorna una instancia de Colaborator o null
+     */
     public function resolveRecord(): ?Colaborator
     {
         return Colaborator::firstOrNew([
@@ -98,6 +117,12 @@ class ColaboratorImporter extends Importer
         ]);
     }
 
+    /**
+     * Genera el mensaje de notificación cuando se completa la importación
+     * 
+     * @param Import $import La instancia del proceso de importación
+     * @return string Mensaje formateado con el resultado de la importación
+     */
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Your colaborator import has completed and ' . number_format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
