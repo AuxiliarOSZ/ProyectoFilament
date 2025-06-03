@@ -5,9 +5,8 @@ namespace App\Filament\Resources\ColaboratorResource\Pages;
 use App\Filament\Resources\ColaboratorResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use EightyNine\ExcelImport\ExcelImportAction;
 use Filament\Actions\CreateAction;
-
+use App\Imports\ColaboratorsImport;
 
 
 class ListColaborators extends ListRecords
@@ -17,8 +16,9 @@ class ListColaborators extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            ExcelImportAction::make()
-                ->color('secondary'),
+            \EightyNine\ExcelImport\ExcelImportAction::make()
+                ->color('secondary')
+                ->use(ColaboratorsImport::class),
             CreateAction::make(),
         ];
     }
