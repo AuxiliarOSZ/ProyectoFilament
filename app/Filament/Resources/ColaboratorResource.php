@@ -262,6 +262,23 @@ class ColaboratorResource extends Resource
                     ->boolean(),
             ])
             ->filters([
+                SelectFilter::make('status')
+                    ->label('Activo')
+                    ->options([
+                        '1' => 'Activo',
+                        '0' => 'Inactivo',
+                    ]),
+
+                SelectFilter::make('residential_city')
+                    ->label('Ciudad')
+                    ->options(
+                        Colaborator::query()
+                            ->select('residential_city')
+                            ->distinct()
+                            ->orderBy('residential_city')
+                            ->pluck('residential_city', 'residential_city')
+                    ),
+
                 SelectFilter::make('job_position')
                     ->label('Cargo')
                     ->options([
@@ -269,13 +286,6 @@ class ColaboratorResource extends Resource
                         'Desarrollador' => 'Desarrollador',
                         'Analista' => 'Analista',
                         'Tester' => 'Tester',
-                    ]),
-
-                SelectFilter::make('status')
-                    ->label('Activo')
-                    ->options([
-                        '1' => 'Activo',
-                        '0' => 'Inactivo',
                     ]),
             ])
             ->actions([
