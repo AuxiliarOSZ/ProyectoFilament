@@ -71,18 +71,25 @@ class ColaboratorResource extends Resource
                             ->label('Número de documento')
                             ->suffixIcon('heroicon-o-identification')
                             ->required()
-                            ->integer(),
+                            ->maxLength(20)
+                            ->rule('regex:/^[0-9]{1,20}$/')
+                            ->validationMessages([
+                                'regex' => 'Ingrese un número de documento valido.'
+                            ])
+                            ->helperText('Ingrese solo números, máximo 20 caracteres.'),
 
                         TextInput::make('first_name')
                             ->label('Nombres completos')
                             ->suffixIcon('heroicon-o-user')
                             ->required()
+                            ->dehydrateStateUsing(fn($state) => strtoupper($state))
                             ->maxLength(100),
 
                         TextInput::make('last_name')
                             ->label('Apellidos completos')
                             ->suffixIcon('heroicon-o-user')
                             ->required()
+                            ->dehydrateStateUsing(fn($state) => strtoupper($state))
                             ->maxLength(100),
 
                         Select::make('gender')
@@ -98,6 +105,7 @@ class ColaboratorResource extends Resource
                         DatePicker::make('birth_date')
                             ->label('Fecha de nacimiento')
                             ->suffixIcon('heroicon-o-calendar')
+                            ->maxDate(now())
                             ->required(),
                     ]),
 
@@ -110,6 +118,7 @@ class ColaboratorResource extends Resource
                             ->suffixIcon('heroicon-o-envelope')
                             ->email()
                             ->required()
+                            ->dehydrateStateUsing(fn($state) => strtoupper($state))
                             ->maxLength(255),
 
                         TextInput::make('mobile')
@@ -117,24 +126,36 @@ class ColaboratorResource extends Resource
                             ->suffixIcon('heroicon-o-device-phone-mobile')
                             ->numeric()
                             ->maxLength(15)
-                            ->required(),
+                            ->required()
+                            ->rule('regex:/^[0-9]{1,15}$/')
+                            ->validationMessages([
+                                'regex' => 'Ingrese un número móvil valido'
+                            ])
+                            ->helperText('Ingrese número móvil sin espacios ni prefijos, máximo 15 caracteres.'),
 
                         TextInput::make('phone')
                             ->label('Número fijo')
                             ->suffixIcon('heroicon-o-phone')
                             ->numeric()
-                            ->maxLength(15),
+                            ->maxLength(15)
+                            ->rule('regex:/^[0-9]{1,15}$/')
+                            ->validationMessages([
+                                'regex' => 'Ingrese un número fijo valido'
+                            ])
+                            ->helperText('Ingrese un número fijo sin espacios, máximo 15 caracteres.'),
 
                         TextInput::make('address')
                             ->label('Dirección de residencia')
                             ->suffixIcon('heroicon-o-home')
                             ->required()
+                            ->dehydrateStateUsing(fn($state) => strtoupper($state))
                             ->maxLength(150),
 
                         TextInput::make('residential_city')
                             ->label('Ciudad')
                             ->suffixIcon('heroicon-o-map-pin')
                             ->required()
+                            ->dehydrateStateUsing(fn($state) => strtoupper($state))
                             ->maxLength(100),
                     ]),
 
@@ -146,11 +167,13 @@ class ColaboratorResource extends Resource
                             ->label('Correo corporativo')
                             ->suffixIcon('heroicon-o-envelope')
                             ->email()
+                            ->dehydrateStateUsing(fn($state) => strtoupper($state))
                             ->maxLength(255),
 
                         DatePicker::make('hire_date')
                             ->label('Fecha de contratación')
                             ->suffixIcon('heroicon-o-calendar')
+                            ->maxDate(now())
                             ->required(),
 
                         Select::make('job_position')
@@ -158,10 +181,10 @@ class ColaboratorResource extends Resource
                             ->suffixIcon('heroicon-o-briefcase')
                             ->required()
                             ->options([
-                                'Jefe de proyecto' => 'Jefe de proyecto',
-                                'Desarrollador' => 'Desarrollador',
-                                'Analista' => 'Analista',
-                                'Tester' => 'Tester',
+                                'JEFE DE PROYECTO' => 'Jefe de proyecto',
+                                'DESARROLLADOR' => 'Desarrollador',
+                                'ANALISTA' => 'Analista',
+                                'TESTER' => 'Tester',
                             ]),
 
                         Select::make('education_level')
@@ -169,21 +192,23 @@ class ColaboratorResource extends Resource
                             ->suffixIcon('heroicon-o-academic-cap')
                             ->required()
                             ->options([
-                                'Bachiller' => 'Bachiller',
-                                'Tecnico' => 'Tecnico',
-                                'Tecnologo' => 'Tecnologo',
-                                'Profesional' => 'Profesional',
+                                'BACHILLER' => 'Bachiller',
+                                'TECNICO' => 'Tecnico',
+                                'TECNOLOGO' => 'Tecnologo',
+                                'PROFESIONAL' => 'Profesional',
                             ]),
 
                         FileUpload::make('eps')
                             ->label('EPS')
-                            ->required()
-                            ->extraAttributes(['class' => ' py-2']),
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->helperText('Cargue el archivo en formato PDF.')
+                            ->required(),
 
                         FileUpload::make('arl')
                             ->label('ARL')
-                            ->required()
-                            ->extraAttributes(['class' => ' py-2']),
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->helperText('Cargue el archivo en formato PDF.')
+                            ->required(),
 
                         Toggle::make('status')
                             ->label('Activo')
@@ -194,6 +219,7 @@ class ColaboratorResource extends Resource
                         Textarea::make('notes')
                             ->label('Observaciones')
                             ->columnSpan('full')
+                            ->default('Sin observaciones.')
                             ->required(),
                     ]),
             ]);
