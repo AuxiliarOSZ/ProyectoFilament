@@ -59,8 +59,8 @@ class ColaboratorResource extends Resource
                     ->schema([
                         Select::make('document_type')
                             ->label('Tipo de documento')
-                            ->required()
                             ->suffixIcon('heroicon-o-identification')
+                            ->required()
                             ->options([
                                 'CC' => 'Cédula de ciudadanía',
                                 'CE' => 'Cédula de extranjería',
@@ -75,17 +75,19 @@ class ColaboratorResource extends Resource
 
                         TextInput::make('first_name')
                             ->label('Nombres completos')
-                            ->suffixIcon('')
+                            ->suffixIcon('heroicon-o-user')
                             ->required()
                             ->maxLength(100),
 
                         TextInput::make('last_name')
                             ->label('Apellidos completos')
+                            ->suffixIcon('heroicon-o-user')
                             ->required()
                             ->maxLength(100),
 
                         Select::make('gender')
                             ->label('Género')
+                            ->suffixIcon('heroicon-o-identification')
                             ->required()
                             ->options([
                                 'M' => 'Masculino',
@@ -95,6 +97,7 @@ class ColaboratorResource extends Resource
 
                         DatePicker::make('birth_date')
                             ->label('Fecha de nacimiento')
+                            ->suffixIcon('heroicon-o-calendar')
                             ->required(),
                     ]),
 
@@ -104,30 +107,35 @@ class ColaboratorResource extends Resource
                     ->schema([
                         TextInput::make('personal_email')
                             ->label('Correo personal')
+                            ->suffixIcon('heroicon-o-envelope')
                             ->email()
                             ->required()
                             ->maxLength(255),
 
                         TextInput::make('mobile')
                             ->label('Número móvil')
+                            ->suffixIcon('heroicon-o-device-phone-mobile')
                             ->numeric()
-                            ->maxLength(20)
+                            ->maxLength(15)
                             ->required(),
 
                         TextInput::make('phone')
                             ->label('Número fijo')
+                            ->suffixIcon('heroicon-o-phone')
                             ->numeric()
-                            ->maxLength(20),
+                            ->maxLength(15),
 
                         TextInput::make('address')
                             ->label('Dirección de residencia')
+                            ->suffixIcon('heroicon-o-home')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(150),
 
                         TextInput::make('residential_city')
                             ->label('Ciudad')
+                            ->suffixIcon('heroicon-o-map-pin')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(100),
                     ]),
 
                 Section::make('Detalles laborales')
@@ -136,15 +144,18 @@ class ColaboratorResource extends Resource
                     ->schema([
                         TextInput::make('corporate_email')
                             ->label('Correo corporativo')
+                            ->suffixIcon('heroicon-o-envelope')
                             ->email()
                             ->maxLength(255),
 
                         DatePicker::make('hire_date')
                             ->label('Fecha de contratación')
+                            ->suffixIcon('heroicon-o-calendar')
                             ->required(),
 
                         Select::make('job_position')
                             ->label('Cargo')
+                            ->suffixIcon('heroicon-o-briefcase')
                             ->required()
                             ->options([
                                 'Jefe de proyecto' => 'Jefe de proyecto',
@@ -155,6 +166,7 @@ class ColaboratorResource extends Resource
 
                         Select::make('education_level')
                             ->label('Nivel educativo')
+                            ->suffixIcon('heroicon-o-academic-cap')
                             ->required()
                             ->options([
                                 'Bachiller' => 'Bachiller',
@@ -174,7 +186,10 @@ class ColaboratorResource extends Resource
                             ->extraAttributes(['class' => ' py-2']),
 
                         Toggle::make('status')
-                            ->label('Activo'),
+                            ->label('Activo')
+                            ->inline()
+                            ->onColor('success')
+                            ->offColor('danger'),
 
                         Textarea::make('notes')
                             ->label('Observaciones')
