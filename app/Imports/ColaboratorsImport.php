@@ -33,7 +33,7 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
      * @var array
      */
     private const NULLABLE_FIELDS = ['corporate_email', 'phone', 'notes'];
-    
+
     /**
      * Crea un nuevo modelo Colaborator a partir de la fila importada
      * Retorna null si el registro es un duplicado
@@ -81,7 +81,20 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
         ];
 
         foreach ($requiredFields as $field) {
-            $processed[$field] = strval($row[$field]);
+            if ($field === 'status') {
+                $statusOriginal = strtolower(trim($row['status'] ?? ''));
+                $mappedStatus = match ($statusOriginal) {
+                    'activo' => 1,
+                    'inactivo' => 0,
+                    '1' => 1,
+                    '0' => 0,
+                    default => null,
+                };
+
+                $processed['status'] = $mappedStatus;
+            } else {
+                $processed[$field] = strval($row[$field]);
+            }
         }
 
         return $processed;
@@ -140,7 +153,7 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
             'education_level' => ['required', 'string', 'max:100'],
             'job_position' => ['required', 'string', 'max:100'],
             'hire_date' => ['required', 'date'],
-            'status' => ['required', 'in:activo,inactivo'],
+            'status' => ['required', 'in:1,0'],
             'notes' => ['nullable', 'string', 'max:255'],
         ];
     }
@@ -165,6 +178,7 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
 
         foreach ($uniqueFields as $field => $value) {
             if (Colaborator::where($field, $value)->exists()) {
+
                 return true;
             }
         }
