@@ -81,19 +81,90 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
         ];
 
         foreach ($requiredFields as $field) {
-            if ($field === 'status') {
-                $statusOriginal = strtolower(trim($row['status'] ?? ''));
-                $mappedStatus = match ($statusOriginal) {
-                    'activo' => 1,
-                    'inactivo' => 0,
-                    '1' => 1,
-                    '0' => 0,
-                    default => null,
-                };
+            $value = $row[$field] ?? null;
 
-                $processed['status'] = $mappedStatus;
-            } else {
-                $processed[$field] = strval($row[$field]);
+            switch ($field) {
+                case 'document_type':
+                    $allowedTypes = [
+                        'CC',
+                        'CE',
+                        'TI',
+                    ];
+                    $docType = strtoupper(trim((string) $value));
+                    $processed['document_type'] = in_array($docType, $allowedTypes) ? $docType : null;
+                    break;
+
+                case 'document_number':
+                    $docNumber = preg_replace('/\D/', '', (string) $value);
+                    $processed['document_number'] = (strlen($docNumber) > 20) ? substr($docNumber, 0, 20) : $docNumber;
+                    break;
+
+                case 'first_name':
+                case 'last_name':
+                case 'address':
+                case 'residential_city':
+                    $maxLengths = [
+                        'first_name' => 100,
+                        'last_name' => 100,
+                        'address' => 150,
+                        'residential_city' => 100,
+                    ];
+                    $processed[$field] = strtoupper(trim((string) $value));
+                    if (strlen($processed[$field]) > $maxLengths[$field]) {
+                        $processed[$field] = substr($processed[$field], 0, $maxLengths[$field]);
+                    }
+                    break;
+
+                case 'gender':
+                    $gender = strtoupper(trim((string) $value));
+                    $processed['gender'] = in_array($gender, ['M', 'F', 'O']) ? $gender : null;
+                    break;
+
+                case 'personal_email':
+                case 'corporate_email':
+                    $email = strtolower(trim((string) $value));
+                    $processed[$field] = (strlen($email) > 255) ? substr($email, 0, 255) : $email;
+                    break;
+
+                case 'mobile':
+                case 'phone':
+                    $number = preg_replace('/\D/', '', (string) $value);
+                    $processed[$field] = (strlen($number) > 15) ? substr($number, 0, 15) : $number;
+                    break;
+
+                case 'education_level':
+                    $allowedLevels = [
+                        'BACHILLER',
+                        'TECNICO',
+                        'TECNOLOGO',
+                        'PROFESIONAL',
+                    ];
+                    $level = strtoupper(trim((string) $value));
+                    $processed['education_level'] = in_array($level, $allowedLevels) ? $level : null;
+                    break;
+
+                case 'job_position':
+                    $allowedPositions = [
+                        'JEFE DE PROYECTO',
+                        'DESARROLLADOR',
+                        'ANALISTA',
+                        'TESTER',
+                    ];
+                    $position = strtoupper(trim((string) $value));
+                    $processed['job_position'] = in_array($position, $allowedPositions) ? $position : null;
+                    break;
+
+                case 'status':
+                    $statusOriginal = strtolower(trim((string) $value));
+                    $processed['status'] = match ($statusOriginal) {
+                        'activo', '1' => 1,
+                        'inactivo', '0' => 0,
+                        default => null,
+                    };
+                    break;
+
+                default:
+                    $processed[$field] = strtoupper(trim((string) $value));
             }
         }
 
