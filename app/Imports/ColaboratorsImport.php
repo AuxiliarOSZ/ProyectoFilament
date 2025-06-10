@@ -90,7 +90,7 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
                         'CE',
                         'TI',
                     ];
-                    $docType = strtoupper(trim((string) $value));
+                    $docType = mb_strtoupper(trim((string) $value));
                     $processed['document_type'] = in_array($docType, $allowedTypes) ? $docType : null;
                     break;
 
@@ -109,14 +109,14 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
                         'address' => 150,
                         'residential_city' => 100,
                     ];
-                    $processed[$field] = strtoupper(trim((string) $value));
+                    $processed[$field] = mb_strtoupper(trim((string) $value));
                     if (strlen($processed[$field]) > $maxLengths[$field]) {
                         $processed[$field] = substr($processed[$field], 0, $maxLengths[$field]);
                     }
                     break;
 
                 case 'gender':
-                    $gender = strtoupper(trim((string) $value));
+                    $gender = mb_strtoupper(trim((string) $value));
                     $processed['gender'] = in_array($gender, ['M', 'F', 'O']) ? $gender : null;
                     break;
 
@@ -139,7 +139,7 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
                         'TECNOLOGO',
                         'PROFESIONAL',
                     ];
-                    $level = strtoupper(trim((string) $value));
+                    $level = mb_strtoupper(trim((string) $value));
                     $processed['education_level'] = in_array($level, $allowedLevels) ? $level : null;
                     break;
 
@@ -150,7 +150,7 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
                         'ANALISTA',
                         'TESTER',
                     ];
-                    $position = strtoupper(trim((string) $value));
+                    $position = mb_strtoupper(trim((string) $value));
                     $processed['job_position'] = in_array($position, $allowedPositions) ? $position : null;
                     break;
 
@@ -164,7 +164,7 @@ class ColaboratorsImport implements ToModel, WithHeadingRow, WithValidation, Ski
                     break;
 
                 default:
-                    $processed[$field] = strtoupper(trim((string) $value));
+                    $processed[$field] = mb_strtoupper(trim((string) $value));
             }
         }
 
